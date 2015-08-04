@@ -7,10 +7,11 @@ clc;
 close all
 
 addpath(genpath('./'));
-parpool(16)
+%parpool(16)
 % mexAllcfiles
-%rng('shuffle')
-rng(888)
+rng('shuffle')
+scurr1=rng;
+%rng(888)
 %setting up parameters------
 tic
 SimuSetting.L=100;
@@ -22,6 +23,8 @@ SimuSetting.alpha=1;
 SimuSetting.R=1.5;
 SimuSetting.bead=[SimuSetting.L/2+0.1,SimuSetting.L/4*sqrt(3)];
 SimuSetting.shape=1;  % stands for circle, can be reassigned for other shape
+SimuSetting.VisibleRange=25;
+SimuSetting.VisibleProb=1.0;
 
 %--- construct a blank network with no bead inserted in--------
 BlankNet=construct_net(SimuSetting, 0);
@@ -57,7 +60,8 @@ BlankNet=construct_net(SimuSetting, 0);
   InitialNet=SetUpFix(InitialNet);
   % At this step, there is two extra components in InitialNet.N:
   % fix_x and fix_y to determine if the nodes are free to move
-%
+  InitialNet=SetVisible(InitialNet,SimuSetting);  % set if a node is visible in experiments
+%%
       %--------------
         figure(1)
         PlotStructure(InitialNet,SimuSetting);
@@ -90,6 +94,8 @@ BlankNet=construct_net(SimuSetting, 0);
 % shg
 
 toc
+
+
 save('./CellDeform2NetDeform_angle.mat'); % save the structure change data
 % dis=[d_abs*ones(size(Angle)),Angle];
 % funObj_angle(dis)  % To make sure our target function works properly
@@ -104,7 +110,8 @@ ub=[0.8*ones(1,numAttachedFibers),pi*ones(1,numAttachedFibers)];
 InitialSwarmSpan=ub;
 
 rng('shuffle')
-PSOoptions=optimoptions('particleswarm','Display','iter','UseParallel',true,'InitialSwarmSpan',InitialSwarmSpan,'SwarmSize',300,'InertiaRange',[1e-8,2],'MaxTime',23*60*60);
+scurr2=rng;
+PSOoptions=optimoptions('particleswarm','Display','iter','UseParallel',false,'InitialSwarmSpan',InitialSwarmSpan,'SwarmSize',300,'InertiaRange',[1e-8,2],'MaxTime',23*60*60);
 [Optim_result,fval,exitflag,output]=particleswarm(@funObj_angle,2*numAttachedFibers,lb,ub,PSOoptions);
 %Optim_result is a vector 2*numAttachedFibers in length, the first numAttachedFibers components are the magnitude of the displacements of each node on cell membrane, while the rest numAttachedFibers components are the directions of their displacements
 save(savename);

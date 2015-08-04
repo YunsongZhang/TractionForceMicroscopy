@@ -14,12 +14,12 @@ DeformedNet=CellDeform2NetDeform(CellDeform,InitialNet,SimuSetting);
 temp1=node_position(DeformedNet);
 temp2=node_position(FinalNet);
 %Here I insert a module to pick a part of the degrees of freedom of which we know from observations
-pick_prob=0.8;
-rng(1467)
-box=(rand(size(temp1))<pick_prob);
-temp1(box==0)=0;
-temp2(box==0)=0;
-
+%pick_prob=0.8;
+%rng(1467)
+%box=(rand(size(temp1))<pick_prob);
+%temp1(box==0)=0;
+%temp2(box==0)=0;
+%end of observable nodes picking module
 
 f=norm(temp1-temp2)^2;
 end
